@@ -1,0 +1,21 @@
+{% extends 'main_page/base.html' %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block content %}
+    <h1>Materials</h1>
+    {% if materials %}
+        {% for el in materials %}
+            <div class="alert alert-warning mt-2">
+                <h3>Name: {{ el.name }}</h3>
+                <p>Producer: {{ el.producer }}</p>
+                <p>Cost: {{ el.cost }} $/m.sq.</p>
+                <p>Material type: {{ el.material_type }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No materials found!</p>
+    {% endif %}
+{% endblock %}

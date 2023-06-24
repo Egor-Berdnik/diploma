@@ -1,0 +1,46 @@
+{% extends 'main_page/base.html' %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block content %}
+    <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+      <h1 class="display-4 fw-normal text-body-emphasis">Create your personal wall design</h1>
+      <p class="fs-5 text-body-secondary">This site helps you to pick up qualitative wall materials and calculate
+          the exact cost of covering your walls with materials you choose</p>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card-header py-3">
+            <h4 class="my-0 fw-normal">Materials</h4>
+          </div>
+          <div class="card-body">
+            <ul class="list-unstyled mt-3 mb-4">
+              <li>On this page you can explore our rich collection of wall materials</li>
+            </ul>
+            <a class="w-100 btn btn-lg btn-primary"
+                    href="/materials">Pick up materials</a>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card-header py-3">
+            <h4 class="my-0 fw-normal">Calculations</h4>
+          </div>
+          <div class="card-body">
+            <ul class="list-unstyled mt-3 mb-4">
+              <li>Write in wall metrics</li>
+              <li>Find out working surface</li>
+              <li>Get result of exact cost of covering</li>
+            </ul>
+            <a class="w-100 btn btn-lg btn-primary"
+                    href="{% url 'calculations' %}">Calculate the cost</a>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}

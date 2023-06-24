@@ -1,0 +1,16 @@
+{% extends 'main_page/base.html' %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block content %}
+    <h1>Calculations</h1>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" placeholder="width_wall" class="form-control"><br>
+        <input type="text" placeholder="height_wall" class="form-control"><br>
+        <button type="submit" class="btn btn-success">Add new wall</button>
+        <button type="submit" class="btn btn-success">Result</button>
+    </form>
+{% endblock %}
