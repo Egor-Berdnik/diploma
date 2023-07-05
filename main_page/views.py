@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Materials
+from .models import Materials, Producers
 
 
 def index(request):
@@ -17,3 +17,8 @@ def calculations(request):
 
 def private_office(request):
     return render(request, 'main_page/private_office.html', {'title': 'Private office'})
+
+
+def producers(request):
+    producer = Producers.objects.order_by('name')
+    return render(request, 'main_page/producers.html', {'title': 'Producers', 'producers': producer})
