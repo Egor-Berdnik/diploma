@@ -8,9 +8,20 @@
     <h1>Calculations</h1>
     <form method="post">
         {% csrf_token %}
-        <input type="text" placeholder="Width wall" class="form-control"><br>
-        <input type="text" placeholder="Height wall" class="form-control"><br>
-        <button type="submit" class="btn btn-success">Add new wall</button>
+        <table>
+            {{ form }}
+        </table>
+        <br>
         <button type="submit" class="btn btn-success">Result</button>
+        <button type="submit" class="btn btn-success">Add new wall</button>
+        <br>
+        <div class="alert alert-warning mt-2">
+            <h3>Result square of wall: {{square}}  sq.m.</h3>
+        </div>
+        <br>
+        <div class="alert alert-warning mt-2">
+            <h3>Result price: {{result_price}} $</h3>
+        </div>
+
     </form>
 {% endblock %}
