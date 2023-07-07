@@ -6,13 +6,14 @@
 
 {% block content %}
     <h1>Materials</h1>
-    {% if materials %}
-        {% for el in materials %}
+    {% if posts %}
+        {% for el in posts %}
             <div class="alert alert-warning mt-2">
                 <h3>Name: {{ el.name }}</h3>
-                <p>Producer: {{ el.producer }}</p>
+                <p> Producer: <a href="{{ el.get_absolute_url }}"></a></p>
+                <p>Producer: {{ el.producer.name }}</p>
                 <p>Cost: {{ el.cost }} $/m.sq.</p>
-                <p>Material type: {{ el.material_type }}</p>
+                <p>Material type: {{ el.material_type.name }}</p>
             </div>
         {% endfor %}
     {% else %}

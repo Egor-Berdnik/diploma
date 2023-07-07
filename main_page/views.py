@@ -2,10 +2,12 @@ from django.forms import model_to_dict
 from django.shortcuts import render
 from rest_framework import generics, viewsets
 from rest_framework.generics import APIView
+from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 
 from .models import Materials, Producers, MaterialType
 from .forms import WallForm
+from .templates import *
 from .serializers import MaterialsSerializer, ProducersSerializer, MaterialTypeSerializer
 
 
@@ -13,12 +15,11 @@ def index(request):
     return render(request, 'main_page/index.html')
 
 
-# class MaterialsAPIView(generics.ListAPIView):
-#     queryset = Materials.objects.all()
-#     serializer_class = MaterialsSerializer
-
 class MaterialsAPIView(generics.ListAPIView):
     serializer_class = MaterialsSerializer
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'main_page/materials.html'
+
     def get(self, request):
         m = Materials.objects.all()
         return Response({'posts': MaterialsSerializer(m, many=True).data})
@@ -58,10 +59,22 @@ class MaterialsAPIView(generics.ListAPIView):
 
         return Response({'post': 'delete post ' + str(pk)})
 
+    def get_context_data(self, *args, **kwargs):
+        context = {
+            'materials' : MaterialsSerializer.get_value(self, *args, **kwargs),
+        }
+        return context
+
 
 class ProducersAPIList(generics.ListCreateAPIView):
     queryset = Producers.objects.all()
     serializer_class = ProducersSerializer
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'main_page/producers.html'
+
+    def get(self, request):
+        m = Producers.objects.all()
+        return Response({'posts': ProducersSerializer(m, many=True).data})
 
 
 class ProducersAPIUpdate(generics.UpdateAPIView):
@@ -79,32 +92,18 @@ class MaterialTypeViewSet(viewsets.ModelViewSet):
     serializer_class = MaterialTypeSerializer
 
 
-# def calculations(request):
-#     if request.method == "POST":
-#         width = int(request.POST.get("width"))
-#         height = int(request.POST.get("height"))
-#         cost_of_material = int(request.POST.get("cost_of_material"))
-#         square = width * height
-#         result_price = square * cost_of_material
-#         return render(request, "main_page/calculations.html", {"form": WallForm, 'square': square,
-#                                                                'result_price': result_price})
-#     else:
-#         return render(request, "main_page/calculations.html", {"form": WallForm})
-
-
-# def materials(request):
-#     material = Materials.objects.order_by('name')
-#     return render(request, 'main_page/materials.html', {'title': 'Materials', 'materials': material})
-
-
 def calculations(request):
-    return render(request, 'main_page/calculations.html', {'title': 'Calculations'})
+    if request.method == "POST":
+        width = float(request.POST.get("width"))
+        height = float(request.POST.get("height"))
+        cost_of_material = float(request.POST.get("cost_of_material"))
+        square = width * height
+        result_price = square * cost_of_material
+        return render(request, "main_page/calculations.html", {"form": WallForm, 'square': square,
+                                                               'result_price': result_price})
+    else:
+        return render(request, "main_page/calculations.html", {"form": WallForm})
 
 
 def private_office(request):
     return render(request, 'main_page/private_office.html', {'title': 'Private office'})
-
-
-# def producers(request):
-#     producer = Producers.objects.order_by('name')
-#     return render(request, 'main_page/producers.html', {'title': 'Producers', 'producers': producer})

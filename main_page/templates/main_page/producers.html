@@ -6,8 +6,8 @@
 
 {% block content %}
     <h1>Producers List</h1>
-    {% if producers %}
-        {% for el in producers %}
+    {% if posts %}
+        {% for el in posts %}
             <div class="alert alert-warning mt-2">
                 <h3>Name: {{ el.name }}</h3>
                 <p>Country: {{ el.country }}</p>
