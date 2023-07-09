@@ -1,12 +1,13 @@
 from django.forms import model_to_dict
 from django.shortcuts import render
 from rest_framework import generics, viewsets
-from rest_framework.generics import APIView
+from rest_framework.generics import APIView, get_object_or_404
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 from .models import Materials, Producers, MaterialType
 from .forms import WallForm
 from .templates import *
+from django.shortcuts import get_object_or_404
 from .serializers import MaterialsSerializer, ProducersSerializer, MaterialTypeSerializer
 
 
@@ -85,6 +86,10 @@ class ProducersAPIDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Producers.objects.all()
     serializer_class = ProducersSerializer
 
+    def producers_list(request):
+        producer = Producers.objects.all()
+        return render(request, 'producer_detailed.html', {'producer': producer})
+
 
 class MaterialTypeViewSet(viewsets.ModelViewSet):
     queryset = MaterialType.objects.all()
@@ -119,7 +124,12 @@ def calculations(request):
         total_square += square
         request.session['total_square'] = total_square
 
-        result_price = total_square * cost_of_material
+        price = square * cost_of_material
+
+        result_price = request.session.get('result_price', 0)
+        result_price += price
+        request.session['result_price'] = result_price
+
         return render(request, "main_page/calculations.html",
                       {"form": WallForm, 'square': square,
                        'total_square': total_square, 'result_price': result_price})
