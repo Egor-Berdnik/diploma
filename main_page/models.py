@@ -16,9 +16,6 @@ class Materials(models.Model):
         verbose_name = "Material"
         verbose_name_plural = "Materials"
 
-    def get_absolute_url(self):
-        return reverse('material_detail', kwargs={'pk': self.pk})
-
 
 class Producers(models.Model):
     name = models.CharField(max_length=100)
@@ -33,9 +30,6 @@ class Producers(models.Model):
     class Meta:
         verbose_name = "Producer"
         verbose_name_plural = "Producers"
-
-    def get_absolute_url(self):
-        return reverse('producer_detail', kwargs={'pk': self.pk})
 
 
 class MaterialType(models.Model):
