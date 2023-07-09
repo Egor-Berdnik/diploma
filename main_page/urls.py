@@ -11,7 +11,7 @@ urlpatterns = [
     path('api/wall/materials/', MaterialsAPIView.as_view(), name='materials'),
     path('api/wall/materials/<int:pk>/', MaterialsAPIView.as_view()),
     path('api/wall/producers/', ProducersAPIList.as_view(), name='producers'),
-    path('api/wall/producers/<int:pk>/', ProducersAPIUpdate.as_view()),
+    path('api/wall/producers/<int:pk>/', ProducersAPIUpdate.as_view(), name='producer-update'),
     path('api/wall/producers-detail/<int:pk>/', ProducersAPIDetailView.as_view(), name='producers-detail'),
     path('api/wall/', include(router.urls)),
     path('calculations/', views.calculations, name='calculations'),
