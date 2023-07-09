@@ -92,16 +92,43 @@ class MaterialTypeViewSet(viewsets.ModelViewSet):
 
 
 def calculations(request):
+    """
+    Функция получает параметры из формы WallForm, затем производится расчет произведения
+    параметров width и height. Далее идет условие: если были введены параметры width_of_door
+    и height_of_door, считается их произведение и вычитается из рассчитанного выше параметра
+    square. Далее задается параметр total_square равный нулю и к нему прибавлются все
+    расчитанные значения squar. В результате total_square перемножается на параметр
+    cost_of_material, который передается из модели Materials и получается итоговый
+    результат result_price.
+    В части else передается условие: при окончании сессии вычислений сохраненные результаты
+    удаляются для нового рассчета.
+    """
     if request.method == "POST":
         width = float(request.POST.get("width"))
         height = float(request.POST.get("height"))
+        width_of_door = float(request.POST.get("width_of_door") or 0)
+        height_of_door = float(request.POST.get("height_of_door") or 0)
         cost_of_material = float(request.POST.get("cost_of_material"))
+
         square = width * height
-        result_price = square * cost_of_material
-        return render(request, "main_page/calculations.html", {"form": WallForm, 'square': square,
-                                                               'result_price': result_price})
+        if width_of_door > 0 and height_of_door > 0:
+            square_of_door = width_of_door * height_of_door
+            square -= square_of_door
+
+        total_square = request.session.get('total_square', 0)
+        total_square += square
+        request.session['total_square'] = total_square
+
+        result_price = total_square * cost_of_material
+        return render(request, "main_page/calculations.html",
+                      {"form": WallForm, 'square': square,
+                       'total_square': total_square, 'result_price': result_price})
+
     else:
-        return render(request, "main_page/calculations.html", {"form": WallForm})
+        request.session.pop('total_square', None)
+        form = WallForm()
+
+    return render(request, "main_page/calculations.html", {"form": form})
 
 
 def private_office(request):

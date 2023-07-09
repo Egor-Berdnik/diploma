@@ -4,9 +4,10 @@
 {{ title }}
 {% endblock %}
 
+
 {% block content %}
     <h1>Calculations</h1>
-        <br>
+    <br>
     <h3>Enter params of your walls</h3>
     <form action="" method="post">
         {% csrf_token %}
@@ -21,8 +22,13 @@
         </div>
         <br>
         <div class="alert alert-warning mt-2">
+            <h3>Result total square of wall: {{total_square}}  sq.m.</h3>
+        </div>
+        <br>
+        <div class="alert alert-warning mt-2">
             <h3>Result price: {{result_price}} $</h3>
         </div>
 
     </form>
+
 {% endblock %}
