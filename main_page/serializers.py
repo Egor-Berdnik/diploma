@@ -17,10 +17,10 @@ class MaterialTypeSerializer(serializers.ModelSerializer):
 class MaterialsSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255)
     cost = serializers.FloatField()
-    material_type_id = serializers.IntegerField()
-    producer_id = serializers.IntegerField()
     material_type = MaterialTypeSerializer(read_only=True)
     producer = ProducersSerializer(read_only=True)
+    material_type_id = serializers.IntegerField()
+    producer_id = serializers.IntegerField()
 
     def create(self, validated_data):
         return Materials.objects.create(**validated_data)

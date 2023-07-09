@@ -4,7 +4,6 @@ from rest_framework import generics, viewsets
 from rest_framework.generics import APIView
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
-
 from .models import Materials, Producers, MaterialType
 from .forms import WallForm
 from .templates import *
