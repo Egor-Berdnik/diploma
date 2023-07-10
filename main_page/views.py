@@ -1,10 +1,12 @@
+from django.http import QueryDict
 from django.shortcuts import render
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets, status
 from rest_framework.renderers import TemplateHTMLRenderer
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from .models import Materials, Producers, MaterialType
 from .forms import WallForm
-from .serializers import MaterialsSerializer, ProducersSerializer, MaterialTypeSerializer
+from .serializers import MaterialsSerializer, ProducersSerializer, MaterialTypeSerializer, PutSerializer, WallSerializer
 
 
 def index(request):
@@ -17,49 +19,47 @@ class MaterialsAPIView(generics.ListAPIView):
     template_name = 'main_page/materials.html'
 
     def get(self, request):
-        m = Materials.objects.all()
-        return Response({'posts': MaterialsSerializer(m, many=True).data})
+        materials = Materials.objects.all()
+        serializer = MaterialsSerializer(materials, many=True)
+        return Response({'posts': serializer.data})
 
     def post(self, request):
         serializer = MaterialsSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-
         return Response({'post': serializer.data})
 
     def put(self, request, *args, **kwargs):
-        pk = kwargs.get('pk', None)
-        if not pk:
-            return Response({'error': 'Method PUT not allowed'})
+        pk = self.get_validated_pk(kwargs)
+        material = self.get_material(pk)
 
-        try:
-            instance = Materials.objects.get(pk=pk)
-        except:
-            return Response({'error': 'Object does not exist'})
-
-        serializer = MaterialsSerializer(data=request.data, instance=instance)
+        serializer = self.get_material_serializer(request.data, material)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({'post': serializer.data})
 
     def delete(self, request, *args, **kwargs):
-        pk = kwargs.get('pk', None)
-        if not pk:
-            return Response({'error': 'Method DELETE not allowed'})
-
-        try:
-            record = Materials.objects.filter(pk=pk)
-            record.delete()
-        except:
-            return Response({'error': "Object does not exist"})
-
-        return Response({'post': 'delete post ' + str(pk)})
+        pk = self.get_validated_pk(kwargs)
+        material = self.get_material(pk)
+        material.delete()
+        return Response({'post': f'delete post {pk}'}, status=status.HTTP_204_NO_CONTENT)
 
     def get_context_data(self, *args, **kwargs):
         context = {
-            'materials' : MaterialsSerializer.get_value(self, *args, **kwargs),
+            'materials': self.serializer_class.get_value(self, *args, **kwargs),
         }
         return context
+
+    def get_validated_pk(self, kwargs):
+        serializer = PutSerializer(data=kwargs)
+        serializer.is_valid(raise_exception=True)
+        return serializer.validated_data['pk']
+
+    def get_material(self, pk):
+        return get_object_or_404(Materials, pk=pk)
+
+    def get_material_serializer(self, data, instance=None):
+        return MaterialsSerializer(data=data, instance=instance)
 
 
 class ProducersAPIList(generics.ListCreateAPIView):
@@ -94,45 +94,50 @@ class MaterialTypeViewSet(viewsets.ModelViewSet):
 
 def calculations(request):
     """
-    Функция получает параметры из формы WallForm, затем производится расчет произведения
-    параметров width и height. Далее идет условие: если были введены параметры width_of_door
-    и height_of_door, считается их произведение и вычитается из рассчитанного выше параметра
-    square. Далее задается параметр total_square равный нулю и к нему прибавлются все
-    расчитанные значения squar. В результате total_square перемножается на параметр
-    cost_of_material, который передается из модели Materials и получается итоговый
-    результат result_price.
-    В части else передается условие: при окончании сессии вычислений сохраненные результаты
-    удаляются для нового рассчета.
+        The function receives parameters from the WallForm form and then calculates the product
+    of the width and height parameters. It then checks if the width_of_door and height_of_door
+    parameters were entered, calculates their product, and subtracts it from the previously
+    calculated square. Next, a total_square parameter is set to zero and all calculated
+    square values are added to it. The total_square is then multiplied by the cost_of_material
+    parameter, which is passed from the Materials model, resulting in the final result_price.
+        In the else part, there is a condition to remove the saved calculation results when
+    the calculation session is finished, in order to start fresh for a new calculation.
     """
+    form = WallForm()
+    total_square = request.session.get('total_square', 0)
+    result_price = request.session.get('result_price', 0)
+
     if request.method == "POST":
-        width = float(request.POST.get("width"))
-        height = float(request.POST.get("height"))
-        width_of_door = float(request.POST.get("width_of_door") or 0)
-        height_of_door = float(request.POST.get("height_of_door") or 0)
-        cost_of_material = float(request.POST.get("cost_of_material"))
+        data = QueryDict(request.body)
+        serializer = WallSerializer(data=data)
 
-        square = width * height
-        if width_of_door > 0 and height_of_door > 0:
-            square_of_door = width_of_door * height_of_door
-            square -= square_of_door
+        if serializer.is_valid():
+            width = serializer.validated_data.get("width")
+            height = serializer.validated_data.get("height")
+            width_of_door = serializer.validated_data.get("width_of_door") or 0
+            height_of_door = serializer.validated_data.get("height_of_door") or 0
+            cost_of_material = serializer.validated_data.get("cost_of_material")
 
-        total_square = request.session.get('total_square', 0)
-        total_square += square
-        request.session['total_square'] = total_square
+            square = width * height
+            if width_of_door > 0 and height_of_door > 0:
+                square_of_door = width_of_door * height_of_door
+                square -= square_of_door
 
-        price = square * cost_of_material
+            total_square += square
+            request.session['total_square'] = total_square
 
-        result_price = request.session.get('result_price', 0)
-        result_price += price
-        request.session['result_price'] = result_price
+            price = square * cost_of_material
 
-        return render(request, "main_page/calculations.html",
-                      {"form": WallForm, 'square': square,
-                       'total_square': total_square, 'result_price': result_price})
+            result_price += price
+            request.session['result_price'] = result_price
+
+            return render(request, "main_page/calculations.html",
+                          {"form": WallForm(), 'square': square,
+                           'total_square': total_square, 'result_price': result_price})
 
     else:
         request.session.pop('total_square', None)
-        form = WallForm()
+        request.session.pop('result_price', None)
 
     return render(request, "main_page/calculations.html", {"form": form})
 
