@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -39,6 +40,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main_page.apps.MainPageConfig',
     'rest_framework',
+    'django_celery_results',
+]
+
+CELERY_BROKER_URL = f'redis://localhost:6379'
+CELERY_RESULT_BACKEND = f'redis://localhost:6379'
+CELERY_IMPORTS = [
+    "main_page.tasks"
 ]
 
 MIDDLEWARE = [

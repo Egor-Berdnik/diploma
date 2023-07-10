@@ -1,10 +1,12 @@
 from django.shortcuts import render
 from rest_framework import generics, viewsets
+from rest_framework.generics import APIView
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from .models import Materials, Producers, MaterialType
 from .forms import WallForm
 from .serializers import MaterialsSerializer, ProducersSerializer, MaterialTypeSerializer
+from.tasks import *
 
 
 def index(request):
@@ -139,3 +141,14 @@ def calculations(request):
 
 def private_office(request):
     return render(request, 'main_page/private_office.html', {'title': 'Private office'})
+
+
+def your_view(request):
+    some_task.apply_async()
+
+
+class RunTaskView(APIView):
+    def post(self, request):
+        some_task.delay()
+        test_scheduled_task.delay('Some parameter')
+        return Response({'status': 'success'})
