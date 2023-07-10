@@ -2,6 +2,10 @@ from rest_framework import serializers
 from .models import Materials, Producers, MaterialType
 
 
+class PutSerializer(serializers.Serializer):
+    pk = serializers.IntegerField(required=True)
+
+
 class ProducersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Producers
@@ -33,3 +37,11 @@ class MaterialsSerializer(serializers.Serializer):
         instance.producer_id = validated_data.get('producer_id', instance.producer_id)
         instance.save()
         return instance
+
+
+class WallSerializer(serializers.Serializer):
+    width = serializers.FloatField()
+    height = serializers.FloatField()
+    width_of_door = serializers.FloatField(required=False)
+    height_of_door = serializers.FloatField(required=False)
+    cost_of_material = serializers.FloatField()
