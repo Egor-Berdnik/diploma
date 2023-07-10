@@ -1,13 +1,9 @@
-from django.forms import model_to_dict
 from django.shortcuts import render
 from rest_framework import generics, viewsets
-from rest_framework.generics import APIView, get_object_or_404
-from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
+from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from .models import Materials, Producers, MaterialType
 from .forms import WallForm
-from .templates import *
-from django.shortcuts import get_object_or_404
 from .serializers import MaterialsSerializer, ProducersSerializer, MaterialTypeSerializer
 
 

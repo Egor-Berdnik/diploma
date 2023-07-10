@@ -1,6 +1,4 @@
 from django.db import models
-from django.db.models import ForeignKey
-from django.urls import reverse
 
 
 class Materials(models.Model):
