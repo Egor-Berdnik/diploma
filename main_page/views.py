@@ -1,6 +1,5 @@
 from django.http import QueryDict
 from django.shortcuts import render
-from rest_framework import generics, viewsets
 from rest_framework.generics import APIView
 from rest_framework import generics, viewsets, status
 from rest_framework.renderers import TemplateHTMLRenderer
@@ -8,9 +7,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from .models import Materials, Producers, MaterialType
 from .forms import WallForm
-from .serializers import MaterialsSerializer, ProducersSerializer, MaterialTypeSerializer
-from.tasks import *
-from .serializers import MaterialsSerializer, ProducersSerializer, MaterialTypeSerializer, PutSerializer, WallSerializer
+from .tasks import *
+from .serializers import MaterialsSerializer, ProducersSerializer, \
+    MaterialTypeSerializer, PutSerializer, WallSerializer
 
 
 def index(request):
