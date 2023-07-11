@@ -135,7 +135,7 @@ def calculations(request):
             request.session['result_price'] = result_price
 
             return render(request, "main_page/calculations.html",
-                          {"form": WallForm(), 'square': square,
+                          {"form": WallForm(), 'square': square, 'price': price,
                            'total_square': total_square, 'result_price': result_price})
 
     else:
